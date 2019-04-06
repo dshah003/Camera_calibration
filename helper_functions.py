@@ -17,9 +17,7 @@ def normalization_matrix(pts):
     var_x, var_y = np.var(pts, axis=0)
     s_x = np.sqrt(2/var_x) 
     s_y = np.sqrt(2/var_y)
-#     print("Matrix: {4} : meanx {0}, meany {1}, varx {2}, vary {3}, sx {5}, sy {6} ".format(x_mean, y_mean, var_x, var_y, name, s_x, s_y))
     n = np.array([[s_x, 0, -s_x*x_mean], [0, s_y, -s_y*y_mean], [0, 0, 1]])
-    # print(n)
     n_inv = np.array([ [1./s_x ,  0 , x_mean], [0, 1./s_y, y_mean] , [0, 0, 1] ])
     return n.astype(np.float64), n_inv.astype(np.float64)
 
@@ -68,13 +66,8 @@ def compute_Homography(correspondences):
     N_x_inv = correspondences[7]
 
     N = len(image_points)
-    # print("Number of points in current view : ", N)
 
     M = np.zeros((2*N, 9), dtype=np.float64)
-    # print("Shape of Matrix M : ", M.shape)
-
-    # print("N_model\n", N_x)
-    # print("N_observed\n", N_u)
 
     # create row wise allotment for each 0-2i rows
     # that means 2 rows.. 
@@ -90,14 +83,9 @@ def compute_Homography(correspondences):
 
     h_norm = vh[np.argmin(s)]
     h_norm = h_norm.reshape(3, 3)
-    # print("Normalized Homography Matrix : \n" , h_norm)
-    # print(N_u_inv)
-    # print(N_x)
-    # h = h_norm
+   
     h = np.matmul(np.matmul(N_u_inv,h_norm), N_x)
-    # if abs(h[2, 2]) > 10e-8:
     h = h[:,:]/h[2, 2]
-    # print("Homography for View : \n", h )
     return h
 
 def minimizer(initial_guess, X, Y, h, N):
@@ -162,11 +150,10 @@ def get_intrinsic_parameters(H_r):
         V[2*i] = v_pq(p=0, q=1, H=H)
         V[2*i + 1] = np.subtract(v_pq(p=0, q=0, H=H), v_pq(p=1, q=1, H=H))
 
-    # solve V.b = 0
+    
     u, s, vh = np.linalg.svd(V)
-    # print(u, "\n", s, "\n", vh)
+
     b = vh[np.argmin(s)]
-    # print("V.b = 0 Solution : ", b.shape)
 
     # according to zhangs method
     vc = (b[1]*b[3] - b[0]*b[4])/(b[0]*b[2] - b[1]**2)
@@ -176,18 +163,10 @@ def get_intrinsic_parameters(H_r):
     gamma = -1*((b[1])*(alpha**2) *(beta/l))
     uc = (gamma*vc/beta) - (b[3]*(alpha**2)/l)
 
-    # print([vc,
-    #         l,
-    #         alpha,
-    #         beta,
-    #         gamma,
-    #     uc])
-
     A = np.array([
             [alpha, gamma, uc],
             [0, beta, vc],
             [0, 0, 1.0],
         ])
-    print("Intrinsic Camera Matrix is :")
-    print(A)
+
     return A

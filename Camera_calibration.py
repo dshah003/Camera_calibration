@@ -1,5 +1,3 @@
-
-
 from helper_functions import *
 
 basepath = os.getcwd()
@@ -50,3 +48,5 @@ for i in range(len(H)):
 ## Extract intrensic parameters from Homography Matrix
 
 A = get_intrinsic_parameters(H_refined)
+print("Intrinsic Camera Matrix is :")
+print(A)
