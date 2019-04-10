@@ -50,7 +50,6 @@ def getNormalizedCorrespondences(correspondences):
 
         normalized_objp = normalized_objp[:,:-1]        
         normalized_imp = normalized_imp[:,:-1]
-
         normalized_correspondences.append((imp, worldp, normalized_imp, normalized_objp, N_u, N_x, N_u_inv, N_x_inv))
     return normalized_correspondences
 
@@ -170,3 +169,23 @@ def get_intrinsic_parameters(H_r):
         ])
 
     return A
+
+def get_extrinsic_parameters(A, H_refined):
+    Rot = []
+    transl = []
+    R = np.zeros([3,3])
+    for i in range(len(H_refined)):
+        h1 = H_refined[1][:,0]
+        h2 = H_refined[1][:,1]
+        h3 = H_refined[1][:,2]
+
+        r1 = np.matmul(np.linalg.inv(A), h1)
+        r2 = np.matmul(np.linalg.inv(A), h2)
+        r3 = np.cross(r1, r2)
+        R[:,0] = r1
+        R[:,1] = r2
+        R[:,2] = r3
+        Rot.append(R)
+        t = np.matmul(np.linalg.inv(A), h3)
+        transl.append(t)
+    return Rot, transl
